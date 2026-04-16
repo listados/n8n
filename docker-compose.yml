@@ -19,11 +19,13 @@ services:
       - n8n_network
 
   n8n:
-    image: n8nio/n8n:latest
+    build: .
     container_name: n8n_app
     restart: unless-stopped
-    expose:
-      - "5678"
+#    expose:
+#      - "5678"
+    ports:
+      - "5678:5678"
     environment:
       # Database
       DB_TYPE: postgresdb
@@ -42,14 +44,18 @@ services:
       # Executions
       EXECUTIONS_DATA_PRUNE: "true"
       EXECUTIONS_DATA_MAX_AGE: 336
+      # Python
+      N8N_RUNNERS_ENABLED: "true"
+      N8N_RUNNERS_STDLIB_ALLOW: "*"
+      N8N_RUNNERS_EXTERNAL_ALLOW: "*"
       # Timezone
       GENERIC_TIMEZONE: ${TIMEZONE:-America/Sao_Paulo}
       TZ: ${TIMEZONE:-America/Sao_Paulo}
       # nginx-proxy + Let's Encrypt
-      VIRTUAL_HOST: ${VIRTUAL_HOST:?VIRTUAL_HOST is required}
-      VIRTUAL_PORT: ${VIRTUAL_PORT:-5678}
-      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST:?LETSENCRYPT_HOST is required}
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is required}
+#      VIRTUAL_HOST: ${VIRTUAL_HOST:?VIRTUAL_HOST is required}
+#      VIRTUAL_PORT: ${VIRTUAL_PORT:-5678}
+#      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST:?LETSENCRYPT_HOST is required}
+#      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?LETSENCRYPT_EMAIL is required}
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:
@@ -63,7 +69,7 @@ services:
       start_period: 60s
     networks:
       - n8n_network
-      - nginx_proxy
+#      - nginx_proxy
 
 volumes:
   postgres_data:
@@ -74,6 +80,6 @@ volumes:
 networks:
   n8n_network:
     driver: bridge
-  nginx_proxy:
-    external: true
-    name: nginx-proxy_default
+#  nginx_proxy:
+#    external: true
+#    name: nginx-proxy_default
