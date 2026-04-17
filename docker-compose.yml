@@ -24,8 +24,6 @@ services:
     restart: unless-stopped
     expose:
       - "5678"
-#    ports:
-#      - "5678:5678"
     environment:
       # Database
       DB_TYPE: postgresdb
