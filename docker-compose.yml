@@ -25,6 +25,7 @@ services:
     expose:
       - "5678"
     environment:
+      NODE_OPTIONS: '--max-http-header-size=16384'
       # Database
       DB_TYPE: postgresdb
       DB_POSTGRESDB_HOST: postgres
