@@ -3,6 +3,11 @@ services:
     image: postgres:16-alpine
     container_name: n8n_postgres
     restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-n8n}
       POSTGRES_USER: ${POSTGRES_USER:-n8n}
@@ -24,6 +29,11 @@ services:
     restart: unless-stopped
     expose:
       - "5678"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       NODE_OPTIONS: '--max-http-header-size=16384'
       # Database
@@ -41,8 +51,14 @@ services:
       # Security
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?N8N_ENCRYPTION_KEY is required}
       # Executions
+      # Poda curta: o workflow "2 - Produção de Conteúdo Nômades" gerava 12-19 GB/dia
+      # de binary_data (ver incidente de disco cheio em 2026-10-11).
       EXECUTIONS_DATA_PRUNE: "true"
-      EXECUTIONS_DATA_MAX_AGE: 336
+      EXECUTIONS_DATA_MAX_AGE: 48              # horas
+      EXECUTIONS_DATA_PRUNE_MAX_COUNT: 2000    # teto de execuções guardadas
+      EXECUTIONS_DATA_SAVE_ON_SUCCESS: none    # não guarda execuções bem-sucedidas
+      EXECUTIONS_DATA_SAVE_ON_ERROR: all
+      EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: "false"
       # Python
       N8N_RUNNERS_ENABLED: "true"
       N8N_RUNNERS_STDLIB_ALLOW: "*"
